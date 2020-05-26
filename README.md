@@ -50,7 +50,7 @@ Geometry Dash 기능들을 카톡봇으로 구현. (최신버전: o)
 
 
 
-## Registration,  관련
+## Registration, 연동 관련
 
 ```
 Q: 제 Account ID를 어떻게 알아내나요?
