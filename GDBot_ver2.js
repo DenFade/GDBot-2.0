@@ -231,7 +231,7 @@ GDClient.prototype.authicated = function(){
     /* Bot Account */
 
     this.data.accountID = 12109603;
-    this.data.gjp = "sharcat0607";
+    this.data.gjp = ""; //holy shit
     return this;
 }
 
