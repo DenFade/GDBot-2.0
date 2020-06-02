@@ -166,6 +166,10 @@ function getDataBase(){
     return FileStream.read(PLAYER_ROUTE + "DATABASE.json");
 }
 
+function saveDataBase(db){
+    FileStream.write(PLAYER_ROUTE + "DATABASE.json", Object.json4(db));
+}
+
 function nullDataHandler(pre, change){
     return !pre ? change : pre;
 }
@@ -792,6 +796,7 @@ const Command = {
                 if(pl == -1) return { e: PrefixAttach.e("ID {$1} 인 유저는 존재하지 않습니다.".format(id)) };
                 else {
                     database[pl].sender = context.sender;
+                    saveDataBase(database);
                     return { s: PrefixAttach.s("Sync Successfully!") };
                 }
             }
