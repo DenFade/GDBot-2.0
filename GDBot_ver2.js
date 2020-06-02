@@ -898,7 +898,7 @@ const Command = {
             if(!Array.in(["top", "creators", "fixedtop"], strategy)) return {e: PrefixAttach.e("검색 태그를 입력해주세요\n -> \"top\", \"creators\", \"fixedtop\"") };
             if(!count || count < 1 || count > 2000) count = 100;
             if(strategy == "fixedtop"){
-                result = org.jsoup.Jsoup.connect("https://gdbrowser.com/api/leaderboard?accurate&count={$1}".format(count))
+                result = Jsoup.connect("https://gdbrowser.com/api/leaderboard?accurate&count={$1}".format(count))
                                             .ignoreContentType(true).get().body().text();
                 result = JSON.parse(result);
                 result = result.map((v, i) => {
@@ -921,22 +921,61 @@ const Command = {
     list: {
         isOn: true,
         type: COMMON_CMD,
-        cooldown: 10000,
+        cooldown: 100000,
         run: function(context){
-            let one, list = new java.io.File(FORUM_ROUTE).listFiles().sort((a,b) => String(a).match(/\d/g).join("") - String(b).match(/\d/g).join(""));
-            list = list.map(v => {
-                v = JSON.parse(FileStream.read(v)).data;
-                if(v.position == 1) one = v.name;
+            let res, mlist, elist, llist, alist = Jsoup.connect("https://www.pointercrate.com/demonlist/").get()
+                .select("nav#lists > div");
+            mlist = alist.select("div#mainlist > ul > li").map(v => {
+                let s = v.select("a").toString().split(" - ");
+                let m = {
+                    position: s[0].replace("#", ""),
+                    name: s[1].split("<br>")[0],
+                    creator: v.select("a > i").toString()
+                }
                 return [
-                    [1,76,151].indexOf(v.position) != -1 ? "\n\n" + ["                        --🏅 Main List(1~75) 🏅--", "                   --🥈 Extended List(76~150) 🥈--", "                         --🥉 Legacy List(151~) 🥉--"][(v.position/75|0) + v.position%75 -1] + "\n\n" : "",
-                    "  🔖No. {$1}: {$2} \n".format(v.position, v.name),
-                    "    ➡️ by {$1}\n".format(v.publisher.name),
-                    "    📥 Verified by {$1}\n".format(v.verifier.name),
-                    "    🗂 {$1} records qualified".format(v.records.length)
+                    "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
+                    "    ➡️ by {$1}\n".format(m.creator)
                 ].join("");
             });
 
-            return {s: "👑 Demonlist Ranking 👑\n1st: 🥇{$1}🥇 {$2}\n\n{$3}".format(one, all, list.join("\n\n")) };
+            elist = alist.select("div#extended > ul > li").map(v => {
+                let s = v.select("a").toString().split(" - ");
+                let m = {
+                    position: s[0].replace("#", ""),
+                    name: s[1].split("<br>")[0],
+                    creator: v.select("a > i").toString()
+                }
+                return [
+                    "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
+                    "    ➡️ by {$1}\n".format(m.creator)
+                ].join("");
+            });
+
+            llist = alist.select("div#legacy > ul > li").map(v => {
+                let s = v.select("a").toString().split(" - ");
+                let m = {
+                    position: s[0].replace("#", ""),
+                    name: s[1].split("<br>")[0],
+                    creator: v.select("a > i").toString()
+                }
+                return [
+                    "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
+                    "    ➡️ by {$1}\n".format(m.creator)
+                ].join("");
+            });
+
+
+            res = [
+                "                        --🏅 Main List(1~75) 🏅--",
+                "\n\n",
+                mlist.join("\n\n"),
+                "\n\n\n                   --🥈 Extended List(76~150) 🥈--\n\n",
+                elist.join("\n\n"),
+                "\n\n\n                         --🥉 Legacy List(151~) 🥉--\n\n",
+                llist.join("\n\n")
+            ].join("");
+
+            return {s: "👑 Demonlist Ranking 👑{$1}\n\n{$2}".format(all, res) };
         }
     },
     GDBOT: {
