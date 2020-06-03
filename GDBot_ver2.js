@@ -923,47 +923,58 @@ const Command = {
         type: COMMON_CMD,
         cooldown: 100000,
         run: function(context){
-            let res, mlist, elist, llist, alist = Jsoup.connect("https://www.pointercrate.com/demonlist/").get()
+            let res, tmp, mlist=[], elist=[], llist=[], alist = Jsoup.connect("https://www.pointercrate.com/demonlist/").get()
                 .select("nav#lists > div");
-            mlist = alist.select("div#mainlist > ul > li").map(v => {
+            tmp = {
+                m: alist.select("div#mainlist > ul > li"),
+                e: alist.select("div#extended > uo > li"),
+                l: alist.select("div#legacy > ul > li")
+            };
+            for(var i = 0; i < 75; i++){
+                let v = tmp.m.get(i);
                 let s = v.select("a").toString().split(" - ");
                 let m = {
                     position: s[0].replace("#", ""),
                     name: s[1].split("<br>")[0],
                     creator: v.select("a > i").toString()
                 }
-                return [
+                mlist.push([
                     "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
                     "    ➡️ by {$1}\n".format(m.creator)
-                ].join("");
-            });
+                ].join(""));
+            }
 
-            elist = alist.select("div#extended > ul > li").map(v => {
+            for(var j = 0; j < 75; j++){
+                let v = tmp.e.get(j);
                 let s = v.select("a").toString().split(" - ");
                 let m = {
                     position: s[0].replace("#", ""),
                     name: s[1].split("<br>")[0],
                     creator: v.select("a > i").toString()
                 }
-                return [
+                elist.push([
                     "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
                     "    ➡️ by {$1}\n".format(m.creator)
-                ].join("");
-            });
+                ].join(""));
+            }
 
-            llist = alist.select("div#legacy > ul > li").map(v => {
-                let s = v.select("a").toString().split(" - ");
-                let m = {
-                    position: s[0].replace("#", ""),
-                    name: s[1].split("<br>")[0],
-                    creator: v.select("a > i").toString()
+            for(var k = 0; true; k++){
+                try{
+                    let v = tmp.e.get(j);
+                    let s = v.select("a").toString().split(" - ");
+                    let m = {
+                        position: s[0].replace("#", ""),
+                        name: s[1].split("<br>")[0],
+                        creator: v.select("a > i").toString()
+                    }
+                    llist.push([
+                        "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
+                        "    ➡️ by {$1}\n".format(m.creator)
+                    ].join(""));
+                } catch(e){
+                    break;
                 }
-                return [
-                    "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
-                    "    ➡️ by {$1}\n".format(m.creator)
-                ].join("");
-            });
-
+            }
 
             res = [
                 "                        --🏅 Main List(1~75) 🏅--",
