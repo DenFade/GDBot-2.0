@@ -130,7 +130,7 @@ Deprecated라는 유저한테 개인 코드가 왔을 껍니다. 해당코드를
 최대 약 1000위? 까지 열람 가능 _(fixedtop은 130+@ 까지만 가능)_
 
 
-> !list
+> !demonlist
 
 Demonlist 순위를 열람합니다.
 
