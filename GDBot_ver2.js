@@ -918,7 +918,7 @@ const Command = {
             }
         }
     },
-    list: {
+    demonlist: {
         isOn: true,
         type: COMMON_CMD,
         cooldown: 100000,
@@ -927,16 +927,16 @@ const Command = {
                 .select("nav#lists > div");
             tmp = {
                 m: alist.select("div#mainlist > ul > li"),
-                e: alist.select("div#extended > uo > li"),
+                e: alist.select("div#extended > ul > li"),
                 l: alist.select("div#legacy > ul > li")
             };
             for(var i = 0; i < 75; i++){
                 let v = tmp.m.get(i);
-                let s = v.select("a").toString().split(" - ");
+                let s = v.select("a").html().split(" - ");
                 let m = {
                     position: s[0].replace("#", ""),
                     name: s[1].split("<br>")[0],
-                    creator: v.select("a > i").toString()
+                    creator: v.select("a > i").text()
                 }
                 mlist.push([
                     "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
@@ -946,11 +946,11 @@ const Command = {
 
             for(var j = 0; j < 75; j++){
                 let v = tmp.e.get(j);
-                let s = v.select("a").toString().split(" - ");
+                let s = v.select("a").html().split(" - ");
                 let m = {
                     position: s[0].replace("#", ""),
                     name: s[1].split("<br>")[0],
-                    creator: v.select("a > i").toString()
+                    creator: v.select("a > i").text()
                 }
                 elist.push([
                     "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
@@ -958,20 +958,21 @@ const Command = {
                 ].join(""));
             }
 
-            for(var k = 0; true; k++){
+            for(var k = 0; k>-1; k++){
                 try{
-                    let v = tmp.e.get(j);
-                    let s = v.select("a").toString().split(" - ");
+                    let v = tmp.l.get(k);
+                    let s = v.attr("title").split(" - ");
                     let m = {
                         position: s[0].replace("#", ""),
                         name: s[1].split("<br>")[0],
-                        creator: v.select("a > i").toString()
+                        creator: v.select("a > i").text()
                     }
                     llist.push([
                         "  🔖No. {$1}: {$2} \n".format(m.position, m.name),
                         "    ➡️ by {$1}\n".format(m.creator)
                     ].join(""));
                 } catch(e){
+Log.i(e)
                     break;
                 }
             }
@@ -1071,6 +1072,10 @@ const RoomSetting = {
     },
 
     "Geometry Dash Creator School": {
+    },
+
+    "TestPlace": {
+
     }
 
 };
