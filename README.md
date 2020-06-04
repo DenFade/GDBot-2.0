@@ -140,7 +140,7 @@ Deprecated라는 유저한테 개인 코드가 왔을 껍니다. 해당코드를
 
 > !demonlist
 
-Demonlist 순위를 열람합니다.
+Demonlist 레벨 전체 순위를 열람합니다.
 
 
 
