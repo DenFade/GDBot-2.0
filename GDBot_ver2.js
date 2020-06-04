@@ -62,7 +62,7 @@ const GDQuest = {
     id: null,
     currentRequest: [],
     currentQuest: {
-        allow: ["Geometry dash Community room", "Geometry Dash Bot Channel", "(GMD) Sweetdream Chatroom", "Geometry Dash fhewi chatroom"],
+        allow: [],
         
     },
     advertise: []
@@ -71,7 +71,7 @@ const GDQuest = {
 const GDAdvertisement = {
     id: null,
     setup: {
-        allow: ["Geometry dash Community room", "Geometry Dash Bot Channel", "(GMD) Sweetdream Chatroom", "Geometry Dash fhewi chatroom"],
+        allow: [],
         cancel: function(){
             this.id == null ? false : Looper.clearInterval(this.id);
         }
@@ -972,7 +972,6 @@ const Command = {
                         "    ➡️ by {$1}\n".format(m.creator)
                     ].join(""));
                 } catch(e){
-Log.i(e)
                     break;
                 }
             }
