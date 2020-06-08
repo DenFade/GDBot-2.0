@@ -47,7 +47,7 @@ const ADD_IGNORING_RATE = 22;
 const Bot = {
     isOn: true, //script is on or not
     blacklist: [], //blocked user
-    admin: "De\u200bnF\u200bad\u200be", //admin (you must use your own identifiable nickname)
+    admin: "", //admin (you must use your own identifiable nickname)
     moderator: [], //moderators..(like staff),
     captcha: -2
 };
