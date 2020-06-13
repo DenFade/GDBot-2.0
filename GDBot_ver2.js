@@ -58,26 +58,6 @@ var started = new Date().getTime();
 
 //Static_Field
 
-const GDQuest = {
-    id: null,
-    currentRequest: [],
-    currentQuest: {
-        allow: [],
-        
-    },
-    advertise: []
-};
-
-const GDAdvertisement = {
-    id: null,
-    setup: {
-        allow: [],
-        cancel: function(){
-            this.id == null ? false : Looper.clearInterval(this.id);
-        }
-    }
-}
-
 const Field = {
     register: function(room, sender, data){
         Field[room+"&"+sender] = data;
@@ -170,6 +150,27 @@ function saveDataBase(db){
     FileStream.write(PLAYER_ROUTE + "DATABASE.json", Object.json4(db));
 }
 
+function getQuest(){
+    return FileStream.read(QUEST_ROUTE);
+}
+
+function saveQuest(data){
+    FileStream.write(QUEST_ROUTE, Object.json4(data));
+}
+
+function uploadQuest(data){
+    let q = JSON.parse(getQuest());
+    q.push(data);
+    saveQuest(q);
+}
+
+function deleteQuest(id){
+    let idx, q = JSON.parse(getQuest());
+    idx = q.findIndex(v.id == id);
+    q.splice(idx, 1);
+    saveQuest(q);
+}
+
 function nullDataHandler(pre, change){
     return !pre ? change : pre;
 }
@@ -202,19 +203,21 @@ function commentBuilder(){
 const PLAYER_ROUTE = "/sdcard/GDBot/users/";
 const LEVEL_ROUTE = "/sdcard/GDBot/levels/";
 const FORUM_ROUTE = "/sdcard/GDBot/demonlist/";
-const PROFILE_DATA_ROUTE = "/sdcard/GDBot/profiles/";    //@Deprecated
-const Q_SETUP_ROUTE = "/sdcard/GDBot/quest/setup.json;"
-const AD_SETUP_ROUTE = "/sdcard/GDBot/advertisement/setup.json";
+const QUEST_ROUTE = "/sdcard/GDBot/quests/quest.json";
+const AD_SETUP_ROUTE = "/sdcard/GDBot/advertisements/setup.json";
 
 //Classes
 
-function Profile(gd_profile, clear, tower, exp, level, need, records, recommends){
+function Profile(gd_profile, title, clear, tower, money, exp, level, need, quests, records, recommends){
     this.gd_profile = gd_profile;
+    this.title = nullDataHandler(title, "[ User ]");
     this.clear = nullDataHandler(clear, []);
     this.tower = nullDataHandler(tower, 0);
+    this.money = nullDataHandler(money, 0);
     this.exp = nullDataHandler(exp, 0);
     this.level = nullDataHandler(level, 0);
     this.need = nullDataHandler(need, 1000);
+    this.quests = nullDataHandler(quests, []);
     this.records = nullDataHandler(records, []);
     this.recommends = nullDataHandler(recommends, []);
 }
@@ -238,8 +241,6 @@ GDClient.prototype.authicated = function(){
     this.data.gjp = ""; //holy shit
     return this;
 }
-
-
 
 const Command = {
     getType: function(cmd){
@@ -1253,11 +1254,13 @@ function onCreate(savedInstanceState, activity) {
     var title = new android.widget.TextView(activity);
     var cmd = new android.widget.EditText(activity);
     var button1 = new android.widget.Button(activity);
-    var on = new android.widget.Button(activity);
-    var off = new android.widget.Button(activity);
+    var questtitle = new android.widget.TextView(activity);
+    var questbox = new android.widget.EditText(activity);
+    var upload = new android.widget.Button(activity);
     var result = new android.widget.TextView(activity);
 
     layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+
     title.setText("My Bot Controller");
     title.setTextColor(android.graphics.Color.BLACK);
     button1.setText("run!");
@@ -1269,6 +1272,46 @@ function onCreate(savedInstanceState, activity) {
                 setAlertDialog("[Console]: 결과입니다",res, activity);
             } catch(e) {
                 Api.showToast(e.toString());
+            }
+        }
+    });
+
+    questtitle.setText("Quest Builder");
+    questtitle.setTextColor(android.graphics.Color.BLACK);
+    upload.setText("upload!");
+    upload.setOnClickListener(new android.view.View.OnClickListener(){
+        onClick: function (){
+            try{
+                var now = Date.now();
+                var qset = questbox.getText();
+                qset = String(qset).split("//");
+                if(qset.length < 4) throw new Error("Error to Upload: Illegal quest data");
+
+                var beaf, level = Client.findSingleGDMap(new GDClient("map", {str: qset[0]}));
+                if(!level) throw new Error("Error to Upload: Failed to load level");
+                beaf = Display.GDMapShortify(level.level, level.creator);
+
+                uploadQuest({
+                    id: now - 1592068397238,
+                    levelID: qset[0],
+                    beaf: beaf,
+                    reward: {
+                        exp: Number(qset[1]),
+                        money: Number(qset[2])
+                    },
+                    timeout: Number(qset[3]),
+                    timestamp: now
+                });
+
+                setAlertDialog("Uploaded new Quest! LevelID: " + qset[0],
+                    " -- Reward --\n\n"+
+                    qset[1]+" exp\n"+
+                    qset[2]+" money\n\n"+
+                    " -- Timeout --\n\n"+
+                    Tools.timeIndicator(Number(qset[3]))
+                , activity);
+            } catch(e){
+                Api.showToast(e.message);
             }
         }
     });
