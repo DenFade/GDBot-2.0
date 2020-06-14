@@ -1284,7 +1284,7 @@ function onCreate(savedInstanceState, activity) {
                 var now = Date.now();
                 var qset = questbox.getText();
                 qset = String(qset).split("//");
-                if(qset.length < 4) throw new Error("Error to Upload: Illegal quest data");
+                if(qset.length < 5) throw new Error("Error to Upload: Illegal quest data");
 
                 var beaf, level = Client.findSingleGDMap(new GDClient("map", {str: qset[0]}));
                 if(!level) throw new Error("Error to Upload: Failed to load level");
@@ -1292,6 +1292,7 @@ function onCreate(savedInstanceState, activity) {
 
                 uploadQuest({
                     id: now - 1592068397238,
+                    desc: qset[4],
                     levelID: qset[0],
                     beaf: beaf,
                     reward: {

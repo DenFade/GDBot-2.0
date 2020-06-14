@@ -32,10 +32,11 @@ Geometry Dash 기능들을 카톡봇으로 구현. (최신버전: o)
 - 도움말에 빠트린 !jukebox 명령어 추가
 ```
 
-> 1.0.7 Update
+> 1.0.7 ~ 1.0.8 Update
 
 ```
 - 액티비티 버그 수정
+- 퀘스트에 description 추가
 ```
 
 
