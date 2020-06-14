@@ -1257,7 +1257,6 @@ function onCreate(savedInstanceState, activity) {
     var questtitle = new android.widget.TextView(activity);
     var questbox = new android.widget.EditText(activity);
     var upload = new android.widget.Button(activity);
-    var result = new android.widget.TextView(activity);
 
     layout.setOrientation(android.widget.LinearLayout.VERTICAL);
 
@@ -1319,7 +1318,10 @@ function onCreate(savedInstanceState, activity) {
     layout.addView(title);
     layout.addView(cmd);
     layout.addView(button1);
-    layout.addView(result);
+    layout.addView(questtitle);
+    layout.addView(questbox);
+    layout.addView(upload);
+    
     activity.setContentView(layout);
 
 }
