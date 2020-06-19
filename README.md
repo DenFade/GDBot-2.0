@@ -209,5 +209,3 @@ Made by _DenFade_
 # Last..
 
 Discord: DenFade#3350
-
-Email: rurchi1206@gmail.com
