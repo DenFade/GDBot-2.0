@@ -890,6 +890,126 @@ const Command = {
             }          
         }
     },
+    quest: {
+        isOn: true,
+        type: CIRCULATING_CMD,
+        cooldown: 2000,
+        next: ["next", "pre"],
+        run: function(context){
+            let q = JSON.parse(getQuest());
+            let option = Number.parseInt(context.args[0]) || 0;
+            
+            switch(option){
+                case 1:
+                    q = q.sort((a, b) => a.timestamp - b.timestamp);
+                default: 
+                    q = q.sort((a, b) => b.timestamp - a.timestamp);
+            }
+            Field.register(context.room, context.sender, {
+                q: q,
+                p: 1,
+                l: q.length
+            });
+
+            let res = q.slice(0, 10);
+            res = res.map((v, i) => {
+                return "#{$1} - {$2}\n\n".format(i, v.name)+
+                "🆔 - {$1}\n".format(v.id)+
+                "📢 - {$1}\n".format(v.desc)+
+                "📜 - {$1}\n".format(function(){
+                    let m = v.mode.mode;
+                    switch(m){
+                        case 0:
+                            return "100% Clear";
+                        case 1:
+                            return "Above {$1}%".format(v.mode.needPercentage);
+                        case 2:
+                            return "Between {$1}% ~ {$2}%".format(v.mode.between[0], v.mode.between[1]);
+                    }
+                }())+
+                "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
+                v.beaf;
+            });
+
+            return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), 1, 10, q.length, res.join(line_L))};
+        },
+        cycles: {
+            next: {
+                type: COMMON_CMD,
+                next: ["next", "pre"],
+                run: function(context){
+                    let data = Field.read(context.room, context.sender);
+                    if(data.p == (data.l/10|0)+1) return {e: PrefixAttach.e("다음 페이지가 존재하지 않습니다.")};
+
+                    let res = data.q.slice(0, 10);
+                    let p = data.p+1;
+                    Field.register(context.room, context.sender, {
+                        q: data.q,
+                        p: p,
+                        l: data.q.length
+                    });
+
+                    res = res.map((v, i) => {
+                        return "#{$1} - {$2}\n\n".format(i, v.name)+
+                        "🆔 - {$1}\n".format(v.id)+
+                        "📢 - {$1}\n".format(v.desc)+
+                        "📜 - {$1}\n".format(function(){
+                            let m = v.mode.mode;
+                            switch(m){
+                                case 0:
+                                    return "100% Clear";
+                                case 1:
+                                    return "Above {$1}%".format(v.mode.needPercentage);
+                                case 2:
+                                    return "Between {$1}% ~ {$2}%".format(v.mode.between[0], v.mode.between[1]);
+                            }
+                        }())+
+                        "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
+                        v.beaf;
+                    });
+                
+                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p, q.length, res.join(line_L))};
+                }
+            },
+            pre: {
+                type: COMMON_CMD,
+                next: ["next", "pre"],
+                run: function(context){
+                    let data = Field.read(context.room, context.sender);
+                    if(data.p == 1) return {e: PrefixAttach.e("이전 페이지가 존재하지 않습니다.")};
+
+                    let res = data.q.slice(0, 10);
+                    let p = data.p-1;
+                    Field.register(context.room, context.sender, {
+                        q: data.q,
+                        p: p,
+                        l: data.q.length
+                    });
+
+                    res = res.map((v, i) => {
+                        return "#{$1} - {$2}\n\n".format(i, v.name)+
+                        "🆔 - {$1}\n".format(v.id)+
+                        "📢 - {$1}\n".format(v.desc)+
+                        "📜 - {$1}\n".format(function(){
+                            let m = v.mode.mode;
+                            switch(m){
+                                case 0:
+                                    return "100% Clear";
+                                case 1:
+                                    return "Above {$1}%".format(v.mode.needPercentage);
+                                case 2:
+                                    return "Between {$1}% ~ {$2}%".format(v.mode.between[0], v.mode.between[1]);
+                            }
+                        }())+
+                        "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
+                        v.beaf;
+                    });
+                
+                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p, q.length, res.join(line_L))};
+                }
+            }
+        }
+    },
     leaderboard: {
         isOn: true,
         type: COMMON_CMD, 
@@ -1284,7 +1404,7 @@ function onCreate(savedInstanceState, activity) {
                 var now = Date.now();
                 var qset = questbox.getText();
                 qset = String(qset).split("//");
-                if(qset.length < 5) throw new Error("Error to Upload: Illegal quest data");
+                if(qset.length < 9) throw new Error("Error to Upload: Illegal quest data");
 
                 var beaf, level = Client.findSingleGDMap(new GDClient("map", {str: qset[0]}));
                 if(!level) throw new Error("Error to Upload: Failed to load level");
@@ -1292,14 +1412,20 @@ function onCreate(savedInstanceState, activity) {
 
                 uploadQuest({
                     id: now - 1592068397238,
-                    desc: qset[4],
-                    levelID: qset[0],
+                    name: qset[0],
+                    desc: qset[5],
+                    levelID: qset[1],
                     beaf: beaf,
                     reward: {
-                        exp: Number(qset[1]),
-                        money: Number(qset[2])
+                        exp: Number(qset[2]),
+                        money: Number(qset[3])
                     },
-                    timeout: Number(qset[3]),
+                    mode: {
+                        mode: Number(qset[6]), //0 to 100% complete, 1 to above n%, 2 to between n% ~ r%
+                        needPercentage: Number(qset[7]),
+                        between: qset[8].split("=").map(v => Number(v))
+                    },
+                    timeout: Number(qset[4]),
                     timestamp: now
                 });
 
