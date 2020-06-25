@@ -915,12 +915,12 @@ const Command = {
             res = res.map((v, i) => {
                 return "#{$1} - {$2}\n\n".format(i, v.name)+
                 "🆔 - {$1}\n".format(v.id)+
-                "📢 - {$1}\n".format(v.desc)+
-                "📜 - {$1}\n".format(function(){
+                "📝 - {$1}\n".format(v.desc)+
+                "📋 - {$1}\n".format(function(){
                     let m = v.mode.mode;
                     switch(m){
                         case 0:
-                            return "100% Clear";
+                            return "100% Complete";
                         case 1:
                             return "Above {$1}%".format(v.mode.needPercentage);
                         case 2:
@@ -928,10 +928,12 @@ const Command = {
                     }
                 }())+
                 "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
-                v.beaf;
+                line_S+"\n"+
+                v.beaf+"\n"+
+                line_S;
             });
 
-            return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), 1, 10, q.length, res.join(line_L))};
+            return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), 1, 10 < q.length ? 10 :  q.length, q.length, res.join(line_L))};
         },
         cycles: {
             next: {
@@ -952,12 +954,12 @@ const Command = {
                     res = res.map((v, i) => {
                         return "#{$1} - {$2}\n\n".format(i, v.name)+
                         "🆔 - {$1}\n".format(v.id)+
-                        "📢 - {$1}\n".format(v.desc)+
-                        "📜 - {$1}\n".format(function(){
+                        "📝 - {$1}\n".format(v.desc)+
+                        "📋 - {$1}\n".format(function(){
                             let m = v.mode.mode;
                             switch(m){
                                 case 0:
-                                    return "100% Clear";
+                                    return "100% Complete";
                                 case 1:
                                     return "Above {$1}%".format(v.mode.needPercentage);
                                 case 2:
@@ -965,10 +967,12 @@ const Command = {
                             }
                         }())+
                         "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
-                        v.beaf;
+                        line_S+"\n"+
+                        v.beaf+"\n"+
+                        line_S;
                     });
                 
-                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p, q.length, res.join(line_L))};
+                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p < q.length ? 10*p :  q.length, q.length, res.join(line_L))};
                 }
             },
             pre: {
@@ -989,12 +993,12 @@ const Command = {
                     res = res.map((v, i) => {
                         return "#{$1} - {$2}\n\n".format(i, v.name)+
                         "🆔 - {$1}\n".format(v.id)+
-                        "📢 - {$1}\n".format(v.desc)+
-                        "📜 - {$1}\n".format(function(){
+                        "📝 - {$1}\n".format(v.desc)+
+                        "📋 - {$1}\n".format(function(){
                             let m = v.mode.mode;
                             switch(m){
                                 case 0:
-                                    return "100% Clear";
+                                    return "100% Complete";
                                 case 1:
                                     return "Above {$1}%".format(v.mode.needPercentage);
                                 case 2:
@@ -1002,10 +1006,12 @@ const Command = {
                             }
                         }())+
                         "⏱️ - {$1}\n".format(Tools.timeIndicator(v.timeout))+
-                        v.beaf;
+                        line_S+"\n"+
+                        v.beaf+"\n"+
+                        line_S;
                     });
                 
-                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p, q.length, res.join(line_L))};
+                    return {s: "{$1} 퀘스트 목록입니다 {$1}{$2}\n\n{$3}- Page {$4} ({$5}/{$6}) -\n\n{$7}".format("💰", all, ' '.repeat(30), p, 10*p < q.length ? 10*p :  q.length, q.length, res.join(line_L))};
                 }
             }
         }
@@ -1377,6 +1383,7 @@ function onCreate(savedInstanceState, activity) {
     var questtitle = new android.widget.TextView(activity);
     var questbox = new android.widget.EditText(activity);
     var upload = new android.widget.Button(activity);
+    var caution =  new android.widget.TextView(activity);
 
     layout.setOrientation(android.widget.LinearLayout.VERTICAL);
 
@@ -1406,7 +1413,7 @@ function onCreate(savedInstanceState, activity) {
                 qset = String(qset).split("//");
                 if(qset.length < 9) throw new Error("Error to Upload: Illegal quest data");
 
-                var beaf, level = Client.findSingleGDMap(new GDClient("map", {str: qset[0]}));
+                var beaf, level = Client.findSingleGDMap(new GDClient("map", {str: qset[1]}));
                 if(!level) throw new Error("Error to Upload: Failed to load level");
                 beaf = Display.GDMapShortify(level.level, level.creator);
 
@@ -1429,12 +1436,12 @@ function onCreate(savedInstanceState, activity) {
                     timestamp: now
                 });
 
-                setAlertDialog("Uploaded new Quest! LevelID: " + qset[0],
+                setAlertDialog("Uploaded new Quest! LevelID: " + qset[1],
                     " -- Reward --\n\n"+
-                    qset[1]+" exp\n"+
-                    qset[2]+" money\n\n"+
+                    qset[2]+" exp\n"+
+                    qset[3]+" money\n\n"+
                     " -- Timeout --\n\n"+
-                    Tools.timeIndicator(Number(qset[3]))
+                    Tools.timeIndicator(Number(qset[4]))
                 , activity);
             } catch(e){
                 Api.showToast(e.message);
@@ -1442,12 +1449,15 @@ function onCreate(savedInstanceState, activity) {
         }
     });
 
+    caution.setText("1. 퀘스트 이름\n2. 레벨 ID\n3. exp보상\n4. money보상\n5. timeout\n6. desc\n7. 모드\n8. needPercentage\n9. n=r형식");
+
     layout.addView(title);
     layout.addView(cmd);
     layout.addView(button1);
     layout.addView(questtitle);
     layout.addView(questbox);
     layout.addView(upload);
+    layout.addView(caution);
     
     activity.setContentView(layout);
 
