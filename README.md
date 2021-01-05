@@ -1,5 +1,9 @@
-# GDBot-2.0
+# GDBot-2.0(Deprecated)
 현재 구동되는 GDBot 메인 스크립트 입니다.
+
+:x: 누락됨 :x:
+
+신버전 준비중... [here](https://github.com/acceler8tion/KGDB)
 
 ---
 
